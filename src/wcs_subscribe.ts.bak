@@ -1,0 +1,47 @@
+/**
+ * 订阅事件status   废弃 lib.quickSubscribe代替
+ * 2021-05-31 17:40:24
+ */
+import { SocketEvent } from 'nutils';
+const postgres = require('../../../../common/postgres');
+
+const subscribe_event_list = ['status', "add"];
+
+export const subscribe_event_init = async () => {
+  const wcsSdk = require('./lib');
+  // 先取消全部订阅
+  wcsSdk.clearSubscribe();
+  // 获取全区列表
+  const t_device_list = await postgres('t_device_info')
+    .select("t_device_info.spec_info")
+    .whereRaw("spec_info->>'device_path' is not null")
+  // .leftJoin("t_device_domain", "t_device_info.id", "t_device_domain.device_id")
+  // .leftJoin('t_sys_domain', 't_device_domain.domain_id', 't_sys_domain.id')
+  // .andWhere("t_sys_domain.path", "<@", `${video.root_path}`)
+  //.whereRaw(` nlevel(text2ltree('${video.root_path}')) + 1 = nlevel(t_sys_domain.\"path\");`)//.toString();
+  console.log(t_device_list);
+  for (const device of t_device_list) {
+    let device_path = device.spec_info.device_path.replace("2000000000", '')
+    let content = {
+      device_path: device_path.split('/').slice(0, -2).join('/'),
+      device_type: "group/vbox"
+    }
+    const msg_id = await wcsSdk.subscribeDevice(content);
+    const result = await SocketEvent.listen(msg_id);
+    console.log("已订阅网关盒子状态:", device_path, "事件：status", "订阅响应：", result.reply)
+    for (const event of subscribe_event_list) {
+      if (!device.spec_info.device_path) {
+        continue;
+      }
+      let content = {
+        device_path,
+        // device_type:"device/IPC",
+        event
+      }
+      const msg_id = await wcsSdk.subscribeDevice(content);
+      const result = await SocketEvent.listen(msg_id);
+      console.log("已订阅网关:", device_path, "事件：", event, "订阅响应：", result.reply)
+    }
+  }
+}
+

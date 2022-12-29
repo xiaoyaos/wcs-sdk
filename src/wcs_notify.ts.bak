@@ -1,0 +1,78 @@
+/**
+ * 万为通知事件  废弃  lib.quickListenEvent
+ */
+import { SocketEvent } from 'nutils';
+import postgres from '../../../../common/postgres';
+
+export const init_notify = () => {
+  // 设备状态变化
+  SocketEvent.listens("status_wcs_event", async (data) => {
+    console.log("收到status事件通知", data);
+    let statusMap = { "online": 1, "offline": 0 };
+    let device_path = data.content.device_path;
+
+    // 盒子离线  该盒子下的所有有设备都置为离线  收到盒子在线通知只更新盒子的状态
+    if('group/vbox' == data.content.device_type){
+      if('offline' == data.content.status){
+        let sensor_ids = await postgres('tb_camera').update({ status: data.content.status }).where('device_path', 'like', `${device_path}%`).returning("sensor_id");
+        if(sensor_ids.length){
+          let device_ids = await postgres("t_sensor_info").update({ status: statusMap[data.content.status] }).whereIn('id', sensor_ids).returning('device_id');
+          if(device_ids.length){
+            await postgres("t_device_info").update({ status: statusMap[data.content.status] }).whereIn('id', device_ids);
+          }
+        }
+      }else if('online' == data.content.status){
+        let device_ids = await postgres("t_device_info").select('t_device_info.id')
+        .leftJoin('t_sensor_info','t_device_info.id','t_sensor_info.device_id')
+        .leftJoin('tb_camera', 'tb_camera.sensor_id','t_sensor_info.id')
+        .where('tb_camera.device_path', 'like', `${device_path}%`);
+        device_ids = device_ids.map(p=>{return p.id});
+        if(device_ids.length){
+          await postgres("t_device_info").update({ status: statusMap[data.content.status] }).whereIn('id', device_ids);
+        }
+      }
+      
+    }else{
+      if('group/IPC' == data.content.device_type)
+      device_path = device_path + '/0'
+      let sensor_id = await postgres('tb_camera').update({ status: data.content.status }).where({ device_path }).returning("sensor_id");
+      if(sensor_id.length){
+        await postgres("t_sensor_info").update({ status: statusMap[data.content.status] }).where({ id: sensor_id[0] });
+      }
+    }
+      
+  })
+
+  // 删除设备
+  SocketEvent.listens("delete_wcs_event", async (data) => {
+    console.log("收到delete_wcs_event事件通知", data);
+    // let device_path = data.content.device_path + '/0';
+    // const trx = await postgres.transaction();
+    // try {
+      // let sensor_id = await postgres('tb_camera').del().where({device_path}).transacting(trx).returning("sensor_id");
+      // await postgres("t_sensor_info").del().where({id:sensor_id}).transacting(trx);
+    //   trx.commin();
+    // } catch (error) {
+    //   trx.rollback();
+    //   console.log(error);
+    // }
+
+  })
+
+  // 增加设备
+  SocketEvent.listens("add_wcs_event", async (data) => {
+    let statusMap = { "online": 1, "offline": 0 };
+    if (data.content.device_type.indexOf("group/IPC") >= 0) {
+      // console.log("收到add_wcs_event事件通知", data);
+      let device_code = data.content.ext_info.device_code;
+      let uuid = data.content.device_path.split('/').pop();
+      let device_path = data.content.device_path + '/0';
+      if(device_code.length > 1){
+        let status = data.content.status;
+        console.log({ uuid, device_path, status })
+        await postgres('tb_camera').update({ uuid, device_path, status }).where({ sensor_id: device_code })
+        await postgres("t_sensor_info").update({ status: statusMap[status] }).where({ id: device_code });
+      }
+    }
+  })
+}
