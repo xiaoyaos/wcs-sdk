@@ -1,11 +1,7 @@
 import { test, expect } from '@playwright/test';
 import { WcsSdk } from '../src/lib';
+import info from './config.json';
 
-const info = {
-  username: 'test123',
-  password: 'Test123456',
-  wcs_ws_url: 'ws://115.231.10.152:3098/'
-}
 let wcsSdk: WcsSdk;
 test.beforeAll(async ()=>{
   wcsSdk = new WcsSdk(info.username, info.password, info.wcs_ws_url);

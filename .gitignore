@@ -19,3 +19,4 @@ nyc_output
 /test-results/
 /playwright-report/
 /playwright/.cache/
+/tests/config.json
