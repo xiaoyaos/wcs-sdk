@@ -181,8 +181,8 @@ class WcsSdk {
      * 根据返回的nonce生成responce
      */
     getResponce(nonce) {
-        const password = crypto_1.default.createHash('md5').update(this.strxor('wwtech_key', this.password)).digest().toString('base64');
-        return crypto_1.default.createHash('md5').update(`${this.username}:${password}:${nonce}`).digest().toString('base64');
+        const password = crypto_1.default.createHash('md5').update(this.strxor('wwtech_key', this.password)).digest('hex'); //.toString('base64');
+        return crypto_1.default.createHash('md5').update(`${this.username}:${password}:${nonce}`).digest('hex'); //.toString('base64');
     }
     /**
      * 获取播放url

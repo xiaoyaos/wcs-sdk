@@ -2,7 +2,7 @@
   "name": "wcs-sdk",
   "version": "1.0.0",
   "description": "",
-  "main": "dist/src/index.js",
+  "main": "dist/src/lib.js",
   "scripts": {
     "build": "tsc"
   },
