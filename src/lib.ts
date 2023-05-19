@@ -791,11 +791,11 @@ export class WcsSdk {
   }
 
   /**
- * 获取网关下局域网设备列表
- * @param device_path 
- * @param offset 
- * @param count 
- */
+   * 获取网关下局域网设备列表
+   * @param device_path
+   * @param offset
+   * @param count
+   */
   async query_lan_devices(device_path: string, offset: number, count: number,) {
     const msg_id = this.getMsgId();
     let req_body = {
@@ -807,6 +807,33 @@ export class WcsSdk {
         params: {
           offset,
           count: count > 50 ? 50 : count,
+        },
+        device_path,
+      }
+    }
+    this.exec(req_body);
+    return msg_id;
+  }
+
+  /**
+   * 获取指定设备下通道列表
+   * @param device_path 网关path 例:/dist_15/link_1/2000000000
+   * @param uuid 设备uuid 例:b4dd74da94ac63b96b0a906393ae8c69
+   * @param offset
+   * @param count
+   */
+  async query_device_channels(device_path: string, uuid:string, offset: number, count: number,) {
+    const msg_id = this.getMsgId();
+    let req_body = {
+      namespace: "WCS/main",
+      request: "query.vbox_config",
+      msg_id: msg_id,
+      content: {
+        command: "_get_channels",
+        params: {
+          id:uuid,
+          offset,
+          count: count,
         },
         device_path,
       }
