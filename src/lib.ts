@@ -115,7 +115,7 @@ export class WcsSdk {
     });
     this.ws.on('error', (err) => {
       console.log('wcs ws error', err);
-      this.reconnection();
+      // this.reconnection();
       // this.init();
     });
     this.ws.on('close', (err, reason) => {
@@ -191,7 +191,7 @@ export class WcsSdk {
     // 关闭心跳任务
     clearInterval(this.heartbeat);
     // 关闭连接
-    this.ws.close();
+    // this.ws.close();
     this.init();
   }
 
