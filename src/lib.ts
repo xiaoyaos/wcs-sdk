@@ -11,7 +11,7 @@ export enum WCSPTZCMD {
   tilt_up = "tilt_up", tilt_down = "tilt_down", pan_left = "pan_left", pan_right = "pan_right",
   up_left = "up_left", up_right = "up_right", down_left = "down_left", down_right = "down_right",
   zoom_in = 'zoom_in', zoom_out = 'zoom_out', focus_in = 'focus_in', focus_out = 'focus_out',
-  iris_up = 'iris_up', iris_down = 'iris_down'
+  iris_up = 'iris_up', iris_down = 'iris_down', stop_all = 'stop_all'
 }
 
 export interface WCSPTZSPEED {
@@ -43,25 +43,25 @@ export enum WCSVERBOSE {
 
 // 订阅-通知content基础类型
 export class WCSNOTIFYCONTENTBASE {
-  device_path:string;
-  device_type?:string;
-  status?:'online'|'offline';
+  device_path: string;
+  device_type?: string;
+  status?: 'online' | 'offline';
 }
 
 // 订阅-通知content设备信息
 export interface WCSNOTIFYCONTENTDEVICEINFO extends WCSNOTIFYCONTENTBASE {
-  ext_info:{
-    audio_encoding:string;
-    quality:number;
-    record_quality:number;
-    support_PTZ:boolean;
-    type:string;
-    video_encoding:string;
+  ext_info: {
+    audio_encoding: string;
+    quality: number;
+    record_quality: number;
+    support_PTZ: boolean;
+    type: string;
+    video_encoding: string;
   },
-  manufacturer:string;
-  model:string;
-  name:string;
-  version:string;
+  manufacturer: string;
+  model: string;
+  name: string;
+  version: string;
 }
 
 // 订阅-通知基础类型
@@ -83,10 +83,10 @@ export class WcsSdk {
   reconnection_count = 0;       // 重连次数
   username: string = "admin";
   password: string = "admin";
-  wcs_ws_url:string;
+  wcs_ws_url: string;
   msg_id: number;
 
-  constructor(username: string, password: string, wcs_ws_url:string) {
+  constructor(username: string, password: string, wcs_ws_url: string) {
     this.username = username;
     this.password = password;
     this.wcs_ws_url = wcs_ws_url;
@@ -399,7 +399,7 @@ export class WcsSdk {
    * @param event 事件类型
    * @param callback 回调处理
    */
-  async quickListenEvent(event: 'status_wcs_event' | 'delete_wcs_event' | 'add_wcs_event', callback: (data:WCSNOTIFY)=>void) {
+  async quickListenEvent(event: 'status_wcs_event' | 'delete_wcs_event' | 'add_wcs_event', callback: (data: WCSNOTIFY) => void) {
     if (event == 'add_wcs_event') {
 
     } else if (event == 'delete_wcs_event') {
@@ -409,7 +409,7 @@ export class WcsSdk {
     } else {
       throw new Error(`event: ${event} error`);
     }
-    SocketEvent.listens(event, (data:WCSNOTIFY)=>callback);
+    SocketEvent.listens(event, (data: WCSNOTIFY) => callback);
   }
 
   //-----------------------------------------------------------------------------云台控制
@@ -421,7 +421,7 @@ export class WcsSdk {
    * @param token 
    * @returns 
    */
-  async controlPtz(device_path: string, command: WCSPTZCMD, speed: WCSPTZSPEED, token: string) {
+  async controlPtz(device_path: string, command: WCSPTZCMD, speed: WCSPTZSPEED, token?: string) {
     const msg_id = this.getMsgId();
     let req_body = {
       namespace: "WCS/main",
@@ -433,15 +433,15 @@ export class WcsSdk {
         // up_left、up_right、down_left、down_right、
         // zoom_in、zoom_out、focus_in、 focus_out、
         // iris_up、iris_down
+        // stop_all  停止命令
         params: {
-          token, // 非必须，云台锁定之后需要传入正确token才能控制
           xspeed: speed.xspeed, // x方向转动速度：1~255
-          yspeed: speed.yspeed // y方向转动速度：1~255
+          yspeed: speed.yspeed, // y方向转动速度：1~255
+          token, // 非必须，云台锁定之后需要传入正确token才能控制
         },
         device_path: device_path
       }
     }
-    console.log(req_body)
     this.exec(req_body);
     return msg_id;
   }
@@ -822,7 +822,7 @@ export class WcsSdk {
    * @param offset
    * @param count
    */
-  async query_device_channels(device_path: string, uuid:string, offset: number, count: number,) {
+  async query_device_channels(device_path: string, uuid: string, offset: number, count: number,) {
     const msg_id = this.getMsgId();
     let req_body = {
       namespace: "WCS/main",
@@ -831,7 +831,7 @@ export class WcsSdk {
       content: {
         command: "_get_channels",
         params: {
-          id:uuid,
+          id: uuid,
           offset,
           count: count,
         },

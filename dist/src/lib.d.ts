@@ -22,7 +22,8 @@ export declare enum WCSPTZCMD {
     focus_in = "focus_in",
     focus_out = "focus_out",
     iris_up = "iris_up",
-    iris_down = "iris_down"
+    iris_down = "iris_down",
+    stop_all = "stop_all"
 }
 export interface WCSPTZSPEED {
     xspeed: number;
@@ -146,7 +147,7 @@ export declare class WcsSdk {
      * @param token
      * @returns
      */
-    controlPtz(device_path: string, command: WCSPTZCMD, speed: WCSPTZSPEED, token: string): Promise<number>;
+    controlPtz(device_path: string, command: WCSPTZCMD, speed: WCSPTZSPEED, token?: string): Promise<number>;
     ptzConfig(device_path: string): Promise<number>;
     /**
      * 预置点设置
