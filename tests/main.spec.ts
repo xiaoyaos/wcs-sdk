@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { WcsSdk } from '../src/lib';
+import { WCSPTZCMD, WcsSdk } from '../src/lib';
 import info from './config.json';
 import { SocketEvent } from 'nutils';
 
@@ -52,6 +52,16 @@ test.describe.serial('[WCSSDK] 测试', async () => {
     SocketEvent.listen(msg_id + '', (data) => {
       expect(data.content.channels).toEqual('device');
     })
+  });
+
+  test('[正常测试] 停止移动', async () => {
+    let msg_id = await wcsSdk.controlPtz('/dist_15/link_1/2000000000', WCSPTZCMD.stop_all, { xspeed: 0, yspeed: 0 });
+    const data: any = await new Promise((resolve, reject) => {
+      SocketEvent.listen(msg_id + '', (data) => {
+        resolve(data)
+      })
+    })
+    expect(data.reply).toBe(200);
   });
 })
 

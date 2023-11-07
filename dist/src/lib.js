@@ -34,6 +34,7 @@ var WCSPTZCMD;
     WCSPTZCMD["focus_out"] = "focus_out";
     WCSPTZCMD["iris_up"] = "iris_up";
     WCSPTZCMD["iris_down"] = "iris_down";
+    WCSPTZCMD["stop_all"] = "stop_all";
 })(WCSPTZCMD = exports.WCSPTZCMD || (exports.WCSPTZCMD = {}));
 var WCSPRESETCMD;
 (function (WCSPRESETCMD) {
@@ -402,15 +403,15 @@ class WcsSdk {
                 // up_left、up_right、down_left、down_right、
                 // zoom_in、zoom_out、focus_in、 focus_out、
                 // iris_up、iris_down
+                // stop_all  停止命令
                 params: {
-                    token,
                     xspeed: speed.xspeed,
-                    yspeed: speed.yspeed // y方向转动速度：1~255
+                    yspeed: speed.yspeed,
+                    token, // 非必须，云台锁定之后需要传入正确token才能控制
                 },
                 device_path: device_path
             }
         };
-        console.log(req_body);
         this.exec(req_body);
         return msg_id;
     }
