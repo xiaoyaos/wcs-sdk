@@ -265,6 +265,13 @@ export declare class WcsSdk {
      */
     query_device_channels(device_path: string, uuid: string, offset: number, count: number): Promise<number>;
     /**
+     * 同步设备下通道信息
+     * @param device_path 网关path 例:/dist_15/link_1/2000000000
+     * @param uuid 设备uuid 例:b4dd74da94ac63b96b0a906393ae8c69
+     * @returns
+     */
+    sync_channels(device_path: string, uuid: string): Promise<number>;
+    /**
      * 主动搜索网关下局域网设备
      * @param device_path
      * @returns
