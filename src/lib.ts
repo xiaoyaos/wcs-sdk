@@ -442,7 +442,17 @@ export class WcsSdk {
         device_path: device_path
       }
     }
-    this.exec(req_body);
+    let index = 3;
+    if(command == WCSPTZCMD.stop_all){
+      index = 1;
+    }
+    let interval = setInterval(() => {
+      this.exec(req_body);
+      if (index >= 3) {
+        clearInterval(interval)
+      }
+      index++
+    }, 100)
     return msg_id;
   }
 
@@ -848,7 +858,7 @@ export class WcsSdk {
    * @param uuid 设备uuid 例:b4dd74da94ac63b96b0a906393ae8c69
    * @returns 
    */
-  async sync_channels(device_path: string,uuid:string){
+  async sync_channels(device_path: string, uuid: string) {
     const msg_id = this.getMsgId();
     let req_body = {
       namespace: "WCS/main",
@@ -857,7 +867,7 @@ export class WcsSdk {
       content: {
         command: "_sync_channels",
         params: {
-          id:uuid,
+          id: uuid,
         },
         device_path
       }
