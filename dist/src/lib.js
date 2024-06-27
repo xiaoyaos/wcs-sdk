@@ -412,7 +412,17 @@ class WcsSdk {
                 device_path: device_path
             }
         };
-        this.exec(req_body);
+        let index = 3;
+        if (command == WCSPTZCMD.stop_all) {
+            index = 1;
+        }
+        let interval = setInterval(() => {
+            this.exec(req_body);
+            if (index >= 3) {
+                clearInterval(interval);
+            }
+            index++;
+        }, 100);
         return msg_id;
     }
     // 预置点列表
