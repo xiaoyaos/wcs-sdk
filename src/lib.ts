@@ -443,7 +443,7 @@ export class WcsSdk {
       }
     }
     let index = 3;
-    if(command == WCSPTZCMD.stop_all){
+    if (command == WCSPTZCMD.stop_all) {
       index = 1;
     }
     let interval = setInterval(() => {
@@ -585,12 +585,14 @@ export class WcsSdk {
   async exec(body: any, callback?: Function) {
     if (this.ws) {
       if (typeof (body) !== 'string' || body.length > 1) {
-        console.log("send=======>", JSON.stringify(body))
+        body = JSON.stringify(body)
+        console.log("send=======>", body)
       }
+
       if (callback) {
-        this.ws.send(JSON.stringify(body), function () { callback() })
+        this.ws.send(body, function () { callback() })
       } else {
-        this.ws.send(JSON.stringify(body))
+        this.ws.send(body)
       }
     }
   }
