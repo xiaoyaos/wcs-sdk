@@ -110,7 +110,17 @@ class WcsSdk {
             // this.init();
         });
         this.ws.on('message', (data) => {
-            data = JSON.parse(data);
+            if (data.toString() == '\r\n') {
+                console.log('receive heart pack');
+                return;
+            }
+            try {
+                data = JSON.parse(data);
+            }
+            catch (error) {
+                console.log("receive data parse error=========>", data);
+                return;
+            }
             console.log("receive=========>", JSON.stringify(data));
             if (!data.msg_id && data.notify) {
                 // console.log("11收到status事件通知", data.event + "_wcs_event");
