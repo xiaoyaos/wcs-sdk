@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WcsSdk = exports.WCSNOTIFY = exports.WCSNOTIFYCONTENTBASE = exports.WCSVERBOSE = exports.WCSPRESETCMD = exports.WCSPTZCMD = exports.WCSVideoEnum = void 0;
 const crypto_1 = __importDefault(require("crypto"));
-const ws_1 = __importDefault(require("ws"));
 const nutils_1 = require("nutils");
+const ws_1 = __importDefault(require("ws"));
 // import { subscribe_event_init } from './wcs_subscribe';
 // import { init_notify } from './wcs_notify';
 var WCSVideoEnum;
@@ -17,6 +17,7 @@ var WCSVideoEnum;
     WCSVideoEnum["HLS"] = "HLS";
     WCSVideoEnum["http_flv"] = "http_flv";
     WCSVideoEnum["websocket_flv"] = "websocket_flv";
+    WCSVideoEnum["websocket_wwav"] = "websocket_wwav";
 })(WCSVideoEnum = exports.WCSVideoEnum || (exports.WCSVideoEnum = {}));
 var WCSPTZCMD;
 (function (WCSPTZCMD) {

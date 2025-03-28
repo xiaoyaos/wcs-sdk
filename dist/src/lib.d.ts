@@ -6,7 +6,8 @@ export declare enum WCSVideoEnum {
     "RTMP" = "RTMP",
     "HLS" = "HLS",
     "http_flv" = "http_flv",
-    "websocket_flv" = "websocket_flv"
+    "websocket_flv" = "websocket_flv",
+    "websocket_wwav" = "websocket_wwav"
 }
 export declare enum WCSPTZCMD {
     tilt_up = "tilt_up",
