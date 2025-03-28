@@ -1,11 +1,11 @@
 import crypto from 'crypto';
-import WebSocket from 'ws';
 import { SocketEvent } from 'nutils';
+import WebSocket from 'ws';
 // import { subscribe_event_init } from './wcs_subscribe';
 // import { init_notify } from './wcs_notify';
 
 export enum WCSVideoEnum {
-  "RTSP" = "RTSP", "WWAV" = "WWAV", "RTMP" = "RTMP", "HLS" = "HLS", "http_flv" = "http_flv", "websocket_flv" = "websocket_flv"
+  "RTSP" = "RTSP", "WWAV" = "WWAV", "RTMP" = "RTMP", "HLS" = "HLS", "http_flv" = "http_flv", "websocket_flv" = "websocket_flv", "websocket_wwav" = "websocket_wwav"
 }
 export enum WCSPTZCMD {
   tilt_up = "tilt_up", tilt_down = "tilt_down", pan_left = "pan_left", pan_right = "pan_right",
@@ -124,7 +124,7 @@ export class WcsSdk {
       // this.init();
     });
     this.ws.on('message', (data: any) => {
-      if(data.toString() == '\r\n'){
+      if (data.toString() == '\r\n') {
         console.log('receive heart pack');
         return;
       }
