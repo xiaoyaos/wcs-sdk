@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { SocketEvent } from 'nutils';
+import { CustomEmitter } from 'nutils';
 import WebSocket from 'ws';
 // import { subscribe_event_init } from './wcs_subscribe';
 // import { init_notify } from './wcs_notify';
@@ -78,18 +78,21 @@ export class WCSNOTIFY {
  */
 export class WcsSdk {
 
-  ws: WebSocket;
-  heartbeat: NodeJS.Timer;
-  reconnection_count = 0;       // 重连次数
-  username: string = "admin";
-  password: string = "admin";
-  wcs_ws_url: string;
-  msg_id: number;
+  private ws: WebSocket;
+  private heartbeat: NodeJS.Timer;
+  private reconnection_count = 0;       // 重连次数
+  private username: string = "admin";
+  private password: string = "admin";
+  private wcs_ws_url: string;
+  private msg_id: number;
+  public socketEmitter: CustomEmitter;
+
 
   constructor(username: string, password: string, wcs_ws_url: string) {
     this.username = username;
     this.password = password;
     this.wcs_ws_url = wcs_ws_url;
+    this.socketEmitter = new CustomEmitter()
     this.init()
   }
 
@@ -137,9 +140,9 @@ export class WcsSdk {
       console.log("receive=========>", JSON.stringify(data))
       if (!data.msg_id && data.notify) {
         // console.log("11收到status事件通知", data.event + "_wcs_event");
-        SocketEvent.emit(data.event + "_wcs_event", data);
+        this.socketEmitter.emit(data.event + "_wcs_event", data);
       } else {
-        SocketEvent.emit(data.msg_id, data);
+        this.socketEmitter.emit(data.msg_id, data);
         switch (data.msg_id) {
           case 101:
             this.login2(data.content.nonce);
@@ -387,7 +390,7 @@ export class WcsSdk {
         device_type
       }
       const msg_id = await this.subscribeDevice(content);
-      const result = await SocketEvent.listen(msg_id + '');
+      const result = await this.socketEmitter.listen(msg_id + '');
       console.log("已订阅网关盒子状态:", device_path, "事件: status", "订阅响应：", result.reply);
 
       for (const event of ['status', "add"]) {
@@ -397,7 +400,7 @@ export class WcsSdk {
           event
         }
         const msg_id = await this.subscribeDevice(content);
-        const result = await SocketEvent.listen(msg_id + '');
+        const result = await this.socketEmitter.listen(msg_id + '');
         console.log("已订阅网关:", device_path, "事件：", event, "订阅响应：", result.reply)
       }
     }
@@ -418,7 +421,7 @@ export class WcsSdk {
     } else {
       throw new Error(`event: ${event} error`);
     }
-    SocketEvent.listens(event, (data: WCSNOTIFY) => callback);
+    this.socketEmitter.listens(event, (data: WCSNOTIFY) => callback);
   }
 
   //-----------------------------------------------------------------------------云台控制
