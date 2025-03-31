@@ -77,10 +77,10 @@ export declare class WCSNOTIFY {
     content: WCSNOTIFYCONTENTBASE | WCSNOTIFYCONTENTDEVICEINFO;
 }
 interface IVideoRecordOptions {
-    /** 开始时间 */
-    start_time: string;
-    /** 结束时间 */
-    end_time: string;
+    /** 开始时间 时间戳 */
+    start_time: number;
+    /** 结束时间 时间戳 */
+    end_time: number;
     /** 视频速度 */
     speed: number;
     /** 时区偏移 */
