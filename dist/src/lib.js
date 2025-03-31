@@ -5,8 +5,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.WcsSdk = exports.WCSNOTIFY = exports.WCSNOTIFYCONTENTBASE = exports.WCSVERBOSE = exports.WCSPRESETCMD = exports.WCSPTZCMD = exports.WCSVideoEnum = void 0;
 const crypto_1 = __importDefault(require("crypto"));
-const ws_1 = __importDefault(require("ws"));
 const nutils_1 = require("nutils");
+const ws_1 = __importDefault(require("ws"));
 // import { subscribe_event_init } from './wcs_subscribe';
 // import { init_notify } from './wcs_notify';
 var WCSVideoEnum;
@@ -17,6 +17,7 @@ var WCSVideoEnum;
     WCSVideoEnum["HLS"] = "HLS";
     WCSVideoEnum["http_flv"] = "http_flv";
     WCSVideoEnum["websocket_flv"] = "websocket_flv";
+    WCSVideoEnum["websocket_wwav"] = "websocket_wwav";
 })(WCSVideoEnum = exports.WCSVideoEnum || (exports.WCSVideoEnum = {}));
 var WCSPTZCMD;
 (function (WCSPTZCMD) {
@@ -34,6 +35,7 @@ var WCSPTZCMD;
     WCSPTZCMD["focus_out"] = "focus_out";
     WCSPTZCMD["iris_up"] = "iris_up";
     WCSPTZCMD["iris_down"] = "iris_down";
+    WCSPTZCMD["stop_all"] = "stop_all";
 })(WCSPTZCMD = exports.WCSPTZCMD || (exports.WCSPTZCMD = {}));
 var WCSPRESETCMD;
 (function (WCSPRESETCMD) {
@@ -109,7 +111,17 @@ class WcsSdk {
             // this.init();
         });
         this.ws.on('message', (data) => {
-            data = JSON.parse(data);
+            if (data.toString() == '\r\n') {
+                console.log('receive heart pack');
+                return;
+            }
+            try {
+                data = JSON.parse(data);
+            }
+            catch (error) {
+                console.log("receive data parse error=========>", data);
+                return;
+            }
             console.log("receive=========>", JSON.stringify(data));
             if (!data.msg_id && data.notify) {
                 // console.log("11收到status事件通知", data.event + "_wcs_event");
@@ -402,16 +414,26 @@ class WcsSdk {
                 // up_left、up_right、down_left、down_right、
                 // zoom_in、zoom_out、focus_in、 focus_out、
                 // iris_up、iris_down
+                // stop_all  停止命令
                 params: {
-                    token,
                     xspeed: speed.xspeed,
-                    yspeed: speed.yspeed // y方向转动速度：1~255
+                    yspeed: speed.yspeed,
+                    token, // 非必须，云台锁定之后需要传入正确token才能控制
                 },
                 device_path: device_path
             }
         };
-        console.log(req_body);
-        this.exec(req_body);
+        let index = 3;
+        if (command == WCSPTZCMD.stop_all) {
+            index = 1;
+        }
+        let interval = setInterval(() => {
+            this.exec(req_body);
+            if (index >= 3) {
+                clearInterval(interval);
+            }
+            index++;
+        }, 100);
         return msg_id;
     }
     // 预置点列表
@@ -538,13 +560,14 @@ class WcsSdk {
     async exec(body, callback) {
         if (this.ws) {
             if (typeof (body) !== 'string' || body.length > 1) {
-                console.log("send=======>", JSON.stringify(body));
+                body = JSON.stringify(body);
+                console.log("send=======>", body);
             }
             if (callback) {
-                this.ws.send(JSON.stringify(body), function () { callback(); });
+                this.ws.send(body, function () { callback(); });
             }
             else {
-                this.ws.send(JSON.stringify(body));
+                this.ws.send(body);
             }
         }
     }
@@ -787,6 +810,29 @@ class WcsSdk {
                     count: count,
                 },
                 device_path,
+            }
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 同步设备下通道信息
+     * @param device_path 网关path 例:/dist_15/link_1/2000000000
+     * @param uuid 设备uuid 例:b4dd74da94ac63b96b0a906393ae8c69
+     * @returns
+     */
+    async sync_channels(device_path, uuid) {
+        const msg_id = this.getMsgId();
+        let req_body = {
+            namespace: "WCS/main",
+            request: "query.vbox_config",
+            msg_id: msg_id,
+            content: {
+                command: "_sync_channels",
+                params: {
+                    id: uuid,
+                },
+                device_path
             }
         };
         this.exec(req_body);
