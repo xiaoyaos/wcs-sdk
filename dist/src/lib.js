@@ -278,21 +278,45 @@ class WcsSdk {
         return msg_id;
     }
     // 打开录像
-    async openRecord(device_path, start_time, end_time, video_quality = 1, speed = 1) {
+    async openRecord(device_path, options) {
         const msg_id = this.getMsgId();
         let req_body = {
             namespace: "WCS/MMS",
-            request: "open.record",
+            request: "open.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
             msg_id: msg_id,
             content: {
                 device_path,
                 params: {
-                    start_time,
-                    end_time,
-                    tz_delta: 0,
-                    video_quality,
-                    speed
+                    start_time: options.start_time,
+                    end_time: options.end_time,
+                    tz_delta: options.tz_delta,
+                    speed: options.speed
                 }
+            }
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 下载入录
+     * @param device_path 设备path
+     * @param options
+     * @returns
+     */
+    async record_download(device_path, options) {
+        const msg_id = this.getMsgId();
+        const req_body = {
+            namespace: 'WCS/main',
+            request: "download.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
+            msg_id,
+            content: {
+                params: {
+                    start_time: options.start_time,
+                    end_time: options.end_time,
+                    tz_delta: options.tz_delta,
+                    speed: options.speed
+                },
+                device_path
             }
         };
         this.exec(req_body);
@@ -855,6 +879,52 @@ class WcsSdk {
                 command: "_search_lan_devices",
                 device_path,
             }
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 申请登入token
+     * @param count 申请数量
+     * @returns
+     */
+    async alloc_login_token(count) {
+        const msg_id = this.getMsgId();
+        const req_body = {
+            namespace: '',
+            request: 'alloc.login_token',
+            msg_id,
+            content: {
+                count
+            }
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 查询可用token数量
+     * @returns
+     */
+    async query_login_token() {
+        const msg_id = this.getMsgId();
+        const req_body = {
+            namespace: '',
+            request: 'query.login_token',
+            msg_id
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 清空token
+     * @returns
+     */
+    async clear_login_token() {
+        const msg_id = this.getMsgId();
+        const req_body = {
+            namespace: '',
+            request: 'clear.login_token',
+            msg_id
         };
         this.exec(req_body);
         return msg_id;

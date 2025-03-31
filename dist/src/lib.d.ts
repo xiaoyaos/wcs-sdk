@@ -76,6 +76,18 @@ export declare class WCSNOTIFY {
     "content-type": 'device_info' | 'status';
     content: WCSNOTIFYCONTENTBASE | WCSNOTIFYCONTENTDEVICEINFO;
 }
+interface IVideoRecordOptions {
+    /** 开始时间 */
+    start_time: string;
+    /** 结束时间 */
+    end_time: string;
+    /** 视频速度 */
+    speed: number;
+    /** 时区偏移 */
+    tz_delta?: number;
+    /** 格式 */
+    type?: string;
+}
 /**
  * 万维交互sdk
  */
@@ -122,7 +134,14 @@ export declare class WcsSdk {
      */
     streamCtrl(stream_id: number, type?: string, cmd?: string, scale?: string, range?: string): Promise<number>;
     queryRecord(device_path: string, start_time: number, end_time: number): Promise<number>;
-    openRecord(device_path: string, start_time: number, end_time: number, video_quality?: number, speed?: number): Promise<number>;
+    openRecord(device_path: string, options: IVideoRecordOptions): Promise<number>;
+    /**
+     * 下载入录
+     * @param device_path 设备path
+     * @param options
+     * @returns
+     */
+    record_download(device_path: string, options: IVideoRecordOptions): Promise<number>;
     subscribeDevice(content: any): Promise<number>;
     subscribeEvent(content: any): Promise<number>;
     cancelSubscribeDevice(sub_id: number): Promise<number>;
@@ -278,5 +297,22 @@ export declare class WcsSdk {
      * @returns
      */
     search_lan_devices(device_path: string): Promise<number>;
+    /**
+     * 申请登入token
+     * @param count 申请数量
+     * @returns
+     */
+    alloc_login_token(count: number): Promise<number>;
+    /**
+     * 查询可用token数量
+     * @returns
+     */
+    query_login_token(): Promise<number>;
+    /**
+     * 清空token
+     * @returns
+     */
+    clear_login_token(): Promise<number>;
 }
+export {};
 //# sourceMappingURL=lib.d.ts.map
