@@ -318,7 +318,7 @@ export class WcsSdk {
     const msg_id = this.getMsgId();
     let req_body = {
       namespace: "WCS/MMS",
-      request: "open.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
+      request: "open.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
       msg_id: msg_id,
       content: {
         device_path,
@@ -335,7 +335,7 @@ export class WcsSdk {
   }
 
   /**
-   * 下载入录
+   * 下载录像
    * @param device_path 设备path
    * @param options 
    * @returns 
@@ -343,8 +343,8 @@ export class WcsSdk {
   async record_download(device_path: string, options: IVideoRecordOptions): Promise<number> {
     const msg_id = this.getMsgId()
     const req_body = {
-      namespace: 'WCS/main',
-      request: "download.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
+      namespace: 'WCS/MMS',
+      request: "download.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
       msg_id,
       content: {
         params: {
