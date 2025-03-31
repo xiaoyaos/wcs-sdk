@@ -1,5 +1,4 @@
-/// <reference types="node" />
-import WebSocket from 'ws';
+import { CustomEmitter } from 'nutils';
 export declare enum WCSVideoEnum {
     "RTSP" = "RTSP",
     "WWAV" = "WWAV",
@@ -81,13 +80,14 @@ export declare class WCSNOTIFY {
  * 万维交互sdk
  */
 export declare class WcsSdk {
-    ws: WebSocket;
-    heartbeat: NodeJS.Timer;
-    reconnection_count: number;
-    username: string;
-    password: string;
-    wcs_ws_url: string;
-    msg_id: number;
+    private ws;
+    private heartbeat;
+    private reconnection_count;
+    private username;
+    private password;
+    private wcs_ws_url;
+    private msg_id;
+    socketEmitter: CustomEmitter;
     constructor(username: string, password: string, wcs_ws_url: string);
     init(): void;
     getMsgId(): number;

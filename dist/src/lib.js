@@ -76,10 +76,12 @@ class WcsSdk {
     password = "admin";
     wcs_ws_url;
     msg_id;
+    socketEmitter;
     constructor(username, password, wcs_ws_url) {
         this.username = username;
         this.password = password;
         this.wcs_ws_url = wcs_ws_url;
+        this.socketEmitter = new nutils_1.CustomEmitter();
         this.init();
     }
     init() {
@@ -125,10 +127,10 @@ class WcsSdk {
             console.log("receive=========>", JSON.stringify(data));
             if (!data.msg_id && data.notify) {
                 // console.log("11收到status事件通知", data.event + "_wcs_event");
-                nutils_1.SocketEvent.emit(data.event + "_wcs_event", data);
+                this.socketEmitter.emit(data.event + "_wcs_event", data);
             }
             else {
-                nutils_1.SocketEvent.emit(data.msg_id, data);
+                this.socketEmitter.emit(data.msg_id, data);
                 switch (data.msg_id) {
                     case 101:
                         this.login2(data.content.nonce);
@@ -362,7 +364,7 @@ class WcsSdk {
                 device_type
             };
             const msg_id = await this.subscribeDevice(content);
-            const result = await nutils_1.SocketEvent.listen(msg_id + '');
+            const result = await this.socketEmitter.listen(msg_id + '');
             console.log("已订阅网关盒子状态:", device_path, "事件: status", "订阅响应：", result.reply);
             for (const event of ['status', "add"]) {
                 let content = {
@@ -371,7 +373,7 @@ class WcsSdk {
                     event
                 };
                 const msg_id = await this.subscribeDevice(content);
-                const result = await nutils_1.SocketEvent.listen(msg_id + '');
+                const result = await this.socketEmitter.listen(msg_id + '');
                 console.log("已订阅网关:", device_path, "事件：", event, "订阅响应：", result.reply);
             }
         }
@@ -391,7 +393,7 @@ class WcsSdk {
         else {
             throw new Error(`event: ${event} error`);
         }
-        nutils_1.SocketEvent.listens(event, (data) => callback);
+        this.socketEmitter.listens(event, (data) => callback);
     }
     //-----------------------------------------------------------------------------云台控制
     /**
