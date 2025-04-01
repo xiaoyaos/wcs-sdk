@@ -295,7 +295,7 @@ export class WcsSdk {
   async queryRecord(device_path: string, start_time: number, end_time: number) {
     const msg_id = this.getMsgId();
     let req_body = {
-      namespace: "WCS/MMS",
+      namespace: "WCS/main",
       request: "query.record",
       msg_id: msg_id,
       content: {
