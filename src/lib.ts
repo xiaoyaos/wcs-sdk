@@ -360,6 +360,34 @@ export class WcsSdk {
     return msg_id
   }
 
+
+  /**
+   * 视频流控制
+   * @param stream_id 流ID
+   * @param cmd 控制命令 PLAY播放 PAUSE暂停
+   * @param scale 播放倍数
+   * @returns 
+   */
+  async control_stream(stream_id: number, cmd: string, scale: number): Promise<number> {
+    const msg_id = this.getMsgId()
+    const req_body = {
+      namespace: 'WCS/MMS',
+      request: "control.stream",
+      msg_id,
+      content: {
+        stream_id,
+        type: 'playback',
+        params: {
+          cmd: cmd,
+          scale: scale + '',
+          range: 'npt=now'
+        }
+      }
+    }
+    this.exec(req_body)
+    return msg_id
+  }
+
   // 订阅消息
   async subscribeDevice(content: any) {
     const msg_id = this.getMsgId();

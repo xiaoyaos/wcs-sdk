@@ -282,7 +282,7 @@ class WcsSdk {
         const msg_id = this.getMsgId();
         let req_body = {
             namespace: "WCS/MMS",
-            request: "open.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
+            request: "open.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
             msg_id: msg_id,
             content: {
                 device_path,
@@ -298,7 +298,7 @@ class WcsSdk {
         return msg_id;
     }
     /**
-     * 下载入录
+     * 下载录像
      * @param device_path 设备path
      * @param options
      * @returns
@@ -306,8 +306,8 @@ class WcsSdk {
     async record_download(device_path, options) {
         const msg_id = this.getMsgId();
         const req_body = {
-            namespace: 'WCS/main',
-            request: "download.record" + `${options.type !== undefined ? '.' : ''}` + options.type,
+            namespace: 'WCS/MMS',
+            request: "download.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
             msg_id,
             content: {
                 params: {
@@ -317,6 +317,32 @@ class WcsSdk {
                     speed: options.speed
                 },
                 device_path
+            }
+        };
+        this.exec(req_body);
+        return msg_id;
+    }
+    /**
+     * 回放流控制
+     * @param stream_id 流ID
+     * @param cmd 控制命令 PLAY播放 PAUSE暂停
+     * @param scale 播放倍数
+     * @returns
+     */
+    async playback_control_stream(stream_id, cmd, scale) {
+        const msg_id = this.getMsgId();
+        const req_body = {
+            namespace: 'WCS/MMS',
+            request: "control.stream",
+            msg_id,
+            content: {
+                stream_id,
+                type: 'playback',
+                params: {
+                    cmd: cmd,
+                    scale: scale + '',
+                    range: 'npt=now'
+                }
             }
         };
         this.exec(req_body);
