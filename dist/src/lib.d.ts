@@ -136,12 +136,20 @@ export declare class WcsSdk {
     queryRecord(device_path: string, start_time: number, end_time: number): Promise<number>;
     openRecord(device_path: string, options: IVideoRecordOptions): Promise<number>;
     /**
-     * 下载入录
+     * 下载录像
      * @param device_path 设备path
      * @param options
      * @returns
      */
     record_download(device_path: string, options: IVideoRecordOptions): Promise<number>;
+    /**
+     * 视频流控制
+     * @param stream_id 流ID
+     * @param cmd 控制命令 PLAY播放 PAUSE暂停
+     * @param scale 播放倍数
+     * @returns
+     */
+    control_stream(stream_id: number, cmd: string, scale: number): Promise<number>;
     subscribeDevice(content: any): Promise<number>;
     subscribeEvent(content: any): Promise<number>;
     cancelSubscribeDevice(sub_id: number): Promise<number>;
