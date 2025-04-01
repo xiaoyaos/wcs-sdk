@@ -323,13 +323,13 @@ class WcsSdk {
         return msg_id;
     }
     /**
-     * 回放流控制
+     * 视频流控制
      * @param stream_id 流ID
      * @param cmd 控制命令 PLAY播放 PAUSE暂停
      * @param scale 播放倍数
      * @returns
      */
-    async playback_control_stream(stream_id, cmd, scale) {
+    async control_stream(stream_id, cmd, scale) {
         const msg_id = this.getMsgId();
         const req_body = {
             namespace: 'WCS/MMS',
