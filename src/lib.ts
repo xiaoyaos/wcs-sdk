@@ -93,6 +93,8 @@ interface IVideoRecordOptions {
 export class WcsSdk {
 
   private ws: WebSocket;
+  private version: 'v1' | 'v2';
+  private namespace: 'WCS/MMS' | 'WCS/MMS_V2';
   private heartbeat: NodeJS.Timer;
   private reconnection_count = 0;       // 重连次数
   private username: string = "admin";
@@ -102,10 +104,12 @@ export class WcsSdk {
   public socketEmitter: CustomEmitter;
 
 
-  constructor(username: string, password: string, wcs_ws_url: string) {
+  constructor(username: string, password: string, wcs_ws_url: string, version: 'v1' | 'v2' = 'v1') {
     this.username = username;
     this.password = password;
     this.wcs_ws_url = wcs_ws_url;
+    this.version = version
+    this.namespace = this.version === 'v1' ? 'WCS/MMS' : 'WCS/MMS_V2'
     this.socketEmitter = new CustomEmitter()
     this.init()
   }
@@ -239,7 +243,7 @@ export class WcsSdk {
     const msg_id = this.getMsgId();
     let request = "open.video." + type
     let req_body = {
-      namespace: "WCS/MMS_V2",
+      namespace: this.namespace,
       request,
       msg_id: msg_id,
       content
@@ -252,7 +256,7 @@ export class WcsSdk {
   async closeVideoStream(stream_id: number) {
     let msg_id = this.getMsgId();
     let req_body = {
-      namespace: "WCS/MMS_V2",
+      namespace: this.namespace,
       request: "close.stream",
       msg_id: msg_id,
       content: {
@@ -274,7 +278,7 @@ export class WcsSdk {
   async streamCtrl(stream_id: number, type = "playback", cmd = "PLAY", scale = "1.0", range = "npt=now") {
     const msg_id = this.getMsgId();
     let req_body = {
-      namespace: "WCS/MMS_V2",
+      namespace: this.namespace,
       request: "close.stream",
       msg_id: msg_id,
       content: {
@@ -317,7 +321,7 @@ export class WcsSdk {
   async openRecord(device_path: string, options: IVideoRecordOptions): Promise<number> {
     const msg_id = this.getMsgId();
     let req_body = {
-      namespace: "WCS/MMS_V2",
+      namespace: this.namespace,
       request: "open.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
       msg_id: msg_id,
       content: {
@@ -343,7 +347,7 @@ export class WcsSdk {
   async record_download(device_path: string, options: IVideoRecordOptions): Promise<number> {
     const msg_id = this.getMsgId()
     const req_body = {
-      namespace: 'WCS/MMS_V2',
+      namespace: this.namespace,
       request: "download.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
       msg_id,
       content: {
@@ -371,7 +375,7 @@ export class WcsSdk {
   async control_stream(stream_id: number, cmd: string, scale: number): Promise<number> {
     const msg_id = this.getMsgId()
     const req_body = {
-      namespace: 'WCS/MMS_V2',
+      namespace: this.namespace,
       request: "control.stream",
       msg_id,
       content: {

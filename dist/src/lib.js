@@ -70,6 +70,8 @@ exports.WCSNOTIFY = WCSNOTIFY;
  */
 class WcsSdk {
     ws;
+    version;
+    namespace;
     heartbeat;
     reconnection_count = 0; // 重连次数
     username = "admin";
@@ -77,10 +79,12 @@ class WcsSdk {
     wcs_ws_url;
     msg_id;
     socketEmitter;
-    constructor(username, password, wcs_ws_url) {
+    constructor(username, password, wcs_ws_url, version = 'v1') {
         this.username = username;
         this.password = password;
         this.wcs_ws_url = wcs_ws_url;
+        this.version = version;
+        this.namespace = this.version === 'v1' ? 'WCS/MMS' : 'WCS/MMS_V2';
         this.socketEmitter = new nutils_1.CustomEmitter();
         this.init();
     }
@@ -208,7 +212,7 @@ class WcsSdk {
         const msg_id = this.getMsgId();
         let request = "open.video." + type;
         let req_body = {
-            namespace: "WCS/MMS_V2",
+            namespace: this.namespace,
             request,
             msg_id: msg_id,
             content
@@ -220,7 +224,7 @@ class WcsSdk {
     async closeVideoStream(stream_id) {
         let msg_id = this.getMsgId();
         let req_body = {
-            namespace: "WCS/MMS_V2",
+            namespace: this.namespace,
             request: "close.stream",
             msg_id: msg_id,
             content: {
@@ -241,7 +245,7 @@ class WcsSdk {
     async streamCtrl(stream_id, type = "playback", cmd = "PLAY", scale = "1.0", range = "npt=now") {
         const msg_id = this.getMsgId();
         let req_body = {
-            namespace: "WCS/MMS_V2",
+            namespace: this.namespace,
             request: "close.stream",
             msg_id: msg_id,
             content: {
@@ -281,7 +285,7 @@ class WcsSdk {
     async openRecord(device_path, options) {
         const msg_id = this.getMsgId();
         let req_body = {
-            namespace: "WCS/MMS_V2",
+            namespace: this.namespace,
             request: "open.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
             msg_id: msg_id,
             content: {
@@ -306,7 +310,7 @@ class WcsSdk {
     async record_download(device_path, options) {
         const msg_id = this.getMsgId();
         const req_body = {
-            namespace: 'WCS/MMS_V2',
+            namespace: this.namespace,
             request: "download.record" + `${Boolean(options.type) ? '.' : ''}` + options.type,
             msg_id,
             content: {
@@ -332,7 +336,7 @@ class WcsSdk {
     async control_stream(stream_id, cmd, scale) {
         const msg_id = this.getMsgId();
         const req_body = {
-            namespace: 'WCS/MMS_V2',
+            namespace: this.namespace,
             request: "control.stream",
             msg_id,
             content: {

@@ -93,6 +93,8 @@ interface IVideoRecordOptions {
  */
 export declare class WcsSdk {
     private ws;
+    private version;
+    private namespace;
     private heartbeat;
     private reconnection_count;
     private username;
@@ -100,7 +102,7 @@ export declare class WcsSdk {
     private wcs_ws_url;
     private msg_id;
     socketEmitter: CustomEmitter;
-    constructor(username: string, password: string, wcs_ws_url: string);
+    constructor(username: string, password: string, wcs_ws_url: string, version?: 'v1' | 'v2');
     init(): void;
     getMsgId(): number;
     /**
