@@ -151,7 +151,7 @@ export declare class WcsSdk {
      * @param scale 播放倍数
      * @returns
      */
-    control_stream(stream_id: number, cmd: string, scale: number): Promise<number>;
+    control_stream(stream_id: number, cmd: string, scale: number, range?: string): Promise<number>;
     subscribeDevice(content: any): Promise<number>;
     subscribeEvent(content: any): Promise<number>;
     cancelSubscribeDevice(sub_id: number): Promise<number>;

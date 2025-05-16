@@ -372,7 +372,7 @@ export class WcsSdk {
    * @param scale 播放倍数
    * @returns 
    */
-  async control_stream(stream_id: number, cmd: string, scale: number): Promise<number> {
+  async control_stream(stream_id: number, cmd: string, scale: number, range: string = ''): Promise<number> {
     const msg_id = this.getMsgId()
     const req_body = {
       namespace: this.namespace,
@@ -383,8 +383,8 @@ export class WcsSdk {
         type: 'playback',
         params: {
           cmd: cmd,
-          scale: scale + '',
-          range: 'npt=now'
+          scale: scale,
+          range
         }
       }
     }
